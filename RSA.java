@@ -5,9 +5,8 @@ import java.util.Base64;
 public class SimpleRSA {
     public static void main(String[] args) throws Exception {
         // Generate RSA key pair
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(2048);
-        KeyPair keyPair = keyGen.generateKeyPair();
+        KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+
 
         String text = "Hello RSA Encryption!";
 
