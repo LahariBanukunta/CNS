@@ -12,14 +12,13 @@ public class SimpleRC4 {
 
         // Encrypt in one line
         cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
-        System.out.println("Encrypted: " +
-                Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes())));
+        String encrypted =  Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes()));
+        System.out.println("Encrypted: " + encrypted);
 
         // Decrypt in one line
         cipher.init(Cipher.DECRYPT_MODE, rc4Key);
         System.out.println("Decrypted: " +
                 new String(cipher.doFinal(Base64.getDecoder().decode(
-                        Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes())))
-                )));
+                        encrypted));
     }
 }
