@@ -1,19 +1,22 @@
 import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import java.util.Base64;
 
-public class RC4Builtin {
+public class AES_CBC_Simple {
     public static void main(String[] args) throws Exception {
-        String keyStr = "SecretKey", msg = "Hello RC4!";
-        SecretKey key = new SecretKeySpec(keyStr.getBytes(), "RC4");
+        SecretKey key = KeyGenerator.getInstance("AES").generateKey(); // Generate random AES key
+        IvParameterSpec iv = new IvParameterSpec(new byte[16]); // 16-byte zero IV
+        String text = "Hello CBC Mode AES!";
 
-        Cipher enc = Cipher.getInstance("RC4");
-        enc.init(Cipher.ENCRYPT_MODE, key);
-        byte[] encrypted = enc.doFinal(msg.getBytes());
-        System.out.println("E: " + Base64.getEncoder().encodeToString(encrypted));
+        // Encrypt & print in one line
+        Cipher encCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        encCipher.init(Cipher.ENCRYPT_MODE, key, iv);
+        String encrypted = Base64.getEncoder().encodeToString(encCipher.doFinal(text.getBytes()));
+        System.out.println("Encrypted: " + encrypted);
 
-        Cipher dec = Cipher.getInstance("RC4");
-        dec.init(Cipher.DECRYPT_MODE, key);
-        System.out.println("D: " + new String(dec.doFinal(encrypted)));
+        // Decrypt & print in one line
+        Cipher decCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        decCipher.init(Cipher.DECRYPT_MODE, key, iv);
+        System.out.println("Decrypted: " + new String(decCipher.doFinal(Base64.getDecoder().decode(encrypted))));
     }
 }
