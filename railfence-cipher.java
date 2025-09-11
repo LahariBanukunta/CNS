@@ -1,57 +1,53 @@
 public class RailFenceCipher {
     static String encrypt(String text, int rails) {
-        StringBuilder[] fence = new StringBuilder[rails];
-        for (int i = 0; i < rails; i++) fence[i] = new StringBuilder();
+        StringBuilder[] rows = new StringBuilder[rails];
+        for (int i = 0; i < rails; i++) rows[i] = new StringBuilder();
 
-        int rail = 0, dir = 1;
-        for (char c : text.toCharArray()) {
-            fence[rail].append(c);
-            rail += dir;
-            if (rail == 0 || rail == rails - 1) dir *= -1;
+        for (int i = 0, r = 0, dir = 1; i < text.length(); i++) {
+            rows[r].append(text.charAt(i));
+            if (r == 0) dir = 1;
+            else if (r == rails - 1) dir = -1;
+            r += dir;
         }
-
-        StringBuilder result = new StringBuilder();
-        for (StringBuilder row : fence) result.append(row);
-        return result.toString();
+        return String.join("", rows);
     }
 
     static String decrypt(String text, int rails) {
         int len = text.length();
-        boolean[][] mark = new boolean[rails][len];
+        boolean[] pattern = new boolean[len];
+        int r = 0, dir = 1, idx = 0;
 
-        int rail = 0, dir = 1;
+        // mark zigzag pattern
         for (int i = 0; i < len; i++) {
-            mark[rail][i] = true;
-            rail += dir;
-            if (rail == 0 || rail == rails - 1) dir *= -1;
+            pattern[i] = (r == 0 || r == rails - 1);
+            if (r == 0) dir = 1;
+            else if (r == rails - 1) dir = -1;
+            r += dir;
         }
 
-        char[][] railMatrix = new char[rails][len];
-        int index = 0;
-        for (int i = 0; i < rails; i++)
-            for (int j = 0; j < len; j++)
-                if (mark[i][j])
-                    railMatrix[i][j] = text.charAt(index++);
-
-        StringBuilder result = new StringBuilder();
-        rail = 0; dir = 1;
-        for (int i = 0; i < len; i++) {
-            result.append(railMatrix[rail][i]);
-            rail += dir;
-            if (rail == 0 || rail == rails - 1) dir *= -1;
+        // fill chars row-wise
+        char[] res = new char[len];
+        for (int row = 0; row < rails; row++) {
+            r = 0; dir = 1;
+            for (int i = 0; i < len; i++) {
+                if (r == row) res[i] = text.charAt(idx++);
+                if (r == 0) dir = 1;
+                else if (r == rails - 1) dir = -1;
+                r += dir;
+            }
         }
-        return result.toString();
+        return new String(res);
     }
 
     public static void main(String[] args) {
         String plain = "HELLO_WORLD";
-        int depth = 3;
-        String encrypted = encrypt(plain, depth);
-        String decrypted = decrypt(encrypted, depth);
-
-        System.out.println("Encrypted: " + encrypted);
-        System.out.println("Decrypted: " + decrypted);
+        int rails = 3;
+        String enc = encrypt(plain, rails);
+        String dec = decrypt(enc, rails);
+        System.out.println("Encrypted: " + enc);
+        System.out.println("Decrypted: " + dec);
     }
 }
+
 Encrypted: HOREL_OLLWD
 Decrypted: HELLO_WORLD
